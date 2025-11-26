@@ -297,12 +297,27 @@ fprint_restartfile_mpi(ldouble t, char* folder)
   MPI_Status status;
   MPI_Request req;
 
+  //Lines added by Brandon strictly for TACC jobs on > 1 node. Comment out otherwise
+  if(PROCID==0)
+  {
+    int rc = MPI_File_open( MPI_COMM_SELF, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
+    //printf("Pre-open: MPI_File_open in fprint_restartfile_mpi, PROCID = %d\n", PROCID);
+    if (rc)
+    {
+      printf( "Pre-open: Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
+    }
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  //End of lines added by Brandon
+
   int rc = MPI_File_open( MPI_COMM_WORLD, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
   //printf("MPI_File_open in fprint_restartfile_mpi, PROCID = %d\n", PROCID);
   if (rc)
   {
     printf( "Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
   }
+
 
   /***** first write all the indices ******/
 
@@ -1187,9 +1202,9 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
     printf( "Unable to open/create file %s\n", fname );fflush(stdout); exit(-1);
   }
 
+  /***** first read ALL the indices ******/
 
-  /***** primitive lengths for restarting with radiation ******/
-  int nvold;
+ int nvold;
 #if defined(RESTARTFROMMHD)
   nvold=9;
 #elif defined(RESTARTFROMNORELEL) // can only do EITHRE RESTARTFROMMHD OR RESTARTFROMNORELEL
@@ -1202,7 +1217,6 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
   nvold=NV;
 #endif
 
-  /***** first read ALL the indices ******/
   //first read the indices pretending to be a single process
   int *indices;
   if((indices = (int *)malloc(NX*NY*NZ*3*sizeof(int)))==NULL) my_err("malloc err. - fileop 5\n");
@@ -1227,7 +1241,6 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
       MPI_File_read( cFile, indices, 3*len, MPI_INT, &status );
 
       //convert to local
-      int some_in_domain=0;
       for(ic=0;ic<len;ic++)
 	{
 	  gix=indices[ic*3+0];
@@ -1237,15 +1250,10 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 	  indices[ic*3+0]=ix;
 	  indices[ic*3+1]=iy;
 	  indices[ic*3+2]=iz;
-	  if(some_in_domain==0 && if_indomain(ix,iy,iz))
-	  {
-	    some_in_domain=1;
-	  }
 	}
 
-      if(some_in_domain)
-      {
       /***** then read primitives in the same order ******/
+
       pos=TNX*TNY*TNZ*(3*sizeof(int)) + procid*NX*NY*NZ*(nvold*sizeof(ldouble)); 
       MPI_File_seek( cFile, pos, MPI_SEEK_SET ); 
       MPI_File_read( cFile, pout, len*nvold, MPI_LDOUBLE, &status );
@@ -1333,7 +1341,6 @@ fread_restartfile_mpi(int nout1, char *folder, ldouble *t)
 
 	    }
 	}
-      }
     }
 
 
@@ -1888,6 +1895,19 @@ fprint_avgfile_mpi(ldouble t, char* folder, char* prefix)
   MPI_Status status;
   MPI_Request req;
 
+  //Lines added by Brandon strictly for TACC jobs on > 1 node. Comment out otherwise
+  if(PROCID==0)
+  {
+    int rc = MPI_File_open( MPI_COMM_SELF, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
+    //printf("Pre-open: MPI_File_open in fprint_avgfile_mpi, PROCID = %d\n", PROCID);
+    if (rc)
+    {
+      printf( "Pre-open: Unable to open/create file %s\n", bufor );fflush(stdout); exit(-1);
+    }
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
+  //End of lines added by Brandon
  
   int rc = MPI_File_open( MPI_COMM_WORLD, bufor, MPI_MODE_WRONLY | MPI_MODE_CREATE, MPI_INFO_NULL, &cFile );
   //printf("MPI_File_open in fprint_avgfile_mpi, PROCID = %d\n", PROCID);
