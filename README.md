@@ -1,6 +1,20 @@
 # README #
 
-This is a somewhat "lighter" version of KORAL, a two-temperature, radiative GRMHD code written by Aleksander Sadowski
+# koral_eccdisk
 
-WARNING: old problem definitions are listed, but files have been removed as they have not been tested on the updated koral_lite code.
-Please contact achael@princeton.edu if you would like to request that they be restored to the code
+Modified version of the KORAL GRMHD code for simulating eccentric accretion disks.
+
+## Overview
+
+This branch implements custom initial conditions that allow prescribed orbital eccentricity (e ≠ 0) in geometrically thick disks.
+
+It is used to study:
+- Evolution and persistence of eccentricity under MRI turbulence
+- Differences between eccentric and circularized disks
+- SANE and MAD magnetic configurations
+- Schwarzschild and Kerr black holes
+
+## Notes
+
+Research development version.  
+Includes experimental features for eccentric disk initialization and parameter studies.
