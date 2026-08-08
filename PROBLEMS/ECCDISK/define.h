@@ -359,7 +359,7 @@
 #define Acut (Rcut / (1. - E_DISK)) //semi-major axis of cutoff
 #define TH_CUT 0.2 //theta taper from the original MAD field setup
 #undef MAXBETA
-#define MAXBETA 0.01*5e6//0.01*1e7 //eq.plane //plasma-beta floor for MAD
+#define MAXBETA 0.01*5e5//0.01*5e6//0.01*1e7 //eq.plane //plasma-beta floor for MAD
 #endif
 
 #if(NTORUS==3) //Modified gaussian disk model with r->a based scaling,update SANE base from the MAD model from Teixeira+2018
